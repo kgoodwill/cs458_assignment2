@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <vector>
 #include <iostream>
-#include <string>
+#include <cstring>
 
 using namespace std;
 
