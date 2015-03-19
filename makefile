@@ -2,11 +2,14 @@ GPP = g++ -g -std=c++11 -lcrypto
 
 all: fscrypt
 
-fscrypt: fscrypt.o
-	$(GPP) fscrypt.o -o fscrypt
+fscrypt: fscrypt.o main.o
+	$(GPP) fscrypt.o main.o -o fscrypt
 
-fscrypt.o: main.cc
-	$(GPP) -c main.cc
+main.o: main.cpp
+	$(GPP) -c main.cpp
+
+fscrypt.o: fscrypt.cpp
+	$(GPP) -c fscrypt.cpp
 
 clean:
 	rm -f *.o *~core fscrypt
