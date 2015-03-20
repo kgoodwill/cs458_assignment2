@@ -1,5 +1,7 @@
 fscrypt.cc implements ECB mode
 
+I assume that the ciphertext never is less than the block length
+
 
 ECB
 Takes the input and breaks it into blocks
