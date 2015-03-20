@@ -15,6 +15,8 @@ void *fs_encrypt(void *plaintext, int bufsize, char *keystr, int *resultlen){
 
 	//string text = (string) (const)ptext;
 	//cout << "converted to string: " << text << endl;
+
+	cout << "bufsize: " << bufsize << endl;
 	
  	int numBytes = (sizeof(char) * strlen(ptext)) + 1;
 	cout << "Number of bytes: " << numBytes << endl;
@@ -31,7 +33,7 @@ void *fs_encrypt(void *plaintext, int bufsize, char *keystr, int *resultlen){
 		//Add to the vector
 		int startValue = i * sizeof(char) * BLOCKSIZE;
 		for(int j = 0; j < BLOCKSIZE; j++){
-			printf("%c\n", ptext[startValue + j]);
+			//printf("%c\n", ptext[startValue + j]);
 			if(ptext[startValue + j] == '\0'){
 				//cout << "Found It" << endl;
 				//Do the padding stuff
@@ -45,10 +47,33 @@ void *fs_encrypt(void *plaintext, int bufsize, char *keystr, int *resultlen){
 		//cout << startValue << endl;
     	unsigned char* tmp = (unsigned char*)malloc(BLOCKSIZE);
     	strncpy((char*)tmp, ptext + startValue, BLOCKSIZE);
-    	cout << tmp << endl;
+    	//cout << tmp << endl;
     	blocks->push_back(tmp);
 	}
-	printf("%s %s\n", blocks->at(0), blocks->at(1));
+	//printf("%s %s\n", blocks->at(0), blocks->at(1));
+
+	//Set up the key
+	BF_KEY* key = (BF_KEY*)malloc(sizeof(BF_KEY));
+	BF_set_key(key, bufsize, (const unsigned char*)keystr);
+
+	//Call the encryption function
+	//void BF_ecb_encrypt(const unsigned char *in, unsigned char *out, 
+	//BF_KEY key, int enc)
+	vector<unsigned char *> *cipherBlocks = new vector<unsigned char *>();
+	for(int i = 0; i < numBlocks; i++){
+		unsigned char *tmp = (unsigned char *)malloc(BLOCKSIZE * sizeof(unsigned char));
+		cipherBlocks->push_back(tmp);
+	}
+
+	for(int i = 0; i < blocks->size(); i++){
+		if(i == 0){
+			BF_ecb_encrypt(blocks->at(i), cipherBlocks->at(i), key, BF_ENCRYPT);
+		}
+		else{
+			//XOR the value and call encryption
+		}
+	}
+
 }
 
 void *fs_decrypt(void *ciphertext, int bufsize, char *keystr, int *resultlen){
