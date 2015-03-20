@@ -59,19 +59,37 @@ void *fs_encrypt(void *plaintext, int bufsize, char *keystr, int *resultlen){
 	//Call the encryption function
 	//void BF_ecb_encrypt(const unsigned char *in, unsigned char *out, 
 	//BF_KEY key, int enc)
-	vector<unsigned char *> *cipherBlocks = new vector<unsigned char *>();
-	for(int i = 0; i < numBlocks; i++){
-		unsigned char *tmp = (unsigned char *)malloc(BLOCKSIZE * sizeof(unsigned char));
-		cipherBlocks->push_back(tmp);
-	}
 
+	vector<unsigned char *> *cipherBlocks = new vector<unsigned char *>();
 	for(int i = 0; i < blocks->size(); i++){
 		if(i == 0){
+			unsigned char *tmp = (unsigned char *)malloc(BLOCKSIZE * sizeof(unsigned char));
+			cipherBlocks->push_back(tmp);
 			BF_ecb_encrypt(blocks->at(i), cipherBlocks->at(i), key, BF_ENCRYPT);
 		}
 		else{
+			unsigned char *cipher = cipherBlocks->at(i-1);
+			unsigned char *plain = blocks->at(i);
+			unsigned char *xorVal = (unsigned char *)malloc(BLOCKSIZE * sizeof(unsigned char));
+			unsigned char *tmp = (unsigned char *)malloc(BLOCKSIZE * sizeof(unsigned char));
 			//XOR the value and call encryption
+			for(int j = 0; j < BLOCKSIZE; j++){
+				//XOR Ci and Pi+1
+				xorVal[j] = plain[j] ^ cipher[j];
+			}
+			cipherBlocks->push_back(tmp);
+			BF_ecb_encrypt(xorVal, cipherBlocks->at(i), key, BF_ENCRYPT);
 		}
+	}
+
+	//Set resultlen to length of the ciphertext
+	*resultlen = numBytes;
+
+	//Take ciphertext vector and convert to char*
+	int outputBytes = BLOCKSIZE * sizeof(unsigned char) * numBlocks;
+	unsigned char *output = (unsigned char *)malloc(outputBytes);
+	for(int i = 0; i < numBlocks; i++){
+		//Grab each block of the ciphertext vector
 	}
 
 }
